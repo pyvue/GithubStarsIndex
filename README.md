@@ -16,6 +16,7 @@
 
 - 🤖 自动抓取 GitHub 账号 Star 的全部仓库
 - 📝 为每个仓库读取 README，调用 AI 生成内容摘要和技术标签
+- ⚡️ **高效率**：支持**并发调用** AI 接口，大幅提升处理大量新项目时的速度
 - 🗃️ **数据驱动**：所有信息存储为 `data/stars.json`，支持二次开发
 - 🎨 **模版驱动**：使用 Jinja2 模版生成 Markdown（未来可扩展 HTML）
 - ⏭️ 增量更新，已处理项目状态保存在 JSON 中，避免重复消耗 API
@@ -51,6 +52,7 @@
 | `GH_USERNAME`        | 要抓取 Stars 的 GitHub 用户名                                  | ✅    |
 | `AI_BASE_URL`        | AI 接口地址（OpenAI 兼容格式，如 `https://api.openai.com/v1`） | ✅    |
 | `AI_MODEL`           | 模型名称（如 `gpt-4o-mini`），不填则用 `config.yml` 默认值     | ❌    |
+| `MAX_CONCURRENCY`    | AI 摘要并发生成数量（默认 `5`），过高可能触发接口限速          | ❌    |
 | `VAULT_SYNC_ENABLED` | 是否启用同步到 Vault 仓库，填 `true` 开启                      | ❌    |
 | `VAULT_REPO`         | Vault 仓库（`owner/repo-name` 格式）                           | ❌    |
 | `VAULT_FILE_PATH`    | `stars.md` 在 Vault 仓库中的路径，默认 `GitHub-Stars/stars.md` | ❌    |
@@ -87,9 +89,10 @@ schedule:
 ```yaml
 ai:
   model: "gpt-4o-mini"         # AI 模型（可被 AI_MODEL Variable 覆盖）
-  max_readme_length: 4000       # README 截取长度（避免超 Token）
+  max_readme_length: 8000       # README 截取长度（避免超 Token）
   timeout: 60                   # 请求超时（秒）
   max_retries: 3                # 失败重试次数
+  concurrency: 5                # 并发生成摘要的线程数（可被 MAX_CONCURRENCY 覆盖）
 
 output:
   file_path: "stars.md"         # 输出文件路径
@@ -139,6 +142,7 @@ export AI_API_KEY="sk-..."                       # AI API Key
 
 # ── 选填环境变量 ──
 export AI_MODEL="gpt-4o-mini"     # 不填则用 config.yml 中的默认值
+export MAX_CONCURRENCY=5          # 并发数
 export GH_TOKEN="ghp_..."         # GitHub Token，不填也能运行，但 API 限速更严（60次/小时）
 
 # 运行

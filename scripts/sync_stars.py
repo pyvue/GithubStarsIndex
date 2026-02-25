@@ -15,9 +15,11 @@ import json
 import time
 import base64
 import logging
+import threading
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional
+from concurrent.futures import ThreadPoolExecutor
 
 import requests
 import yaml
@@ -92,6 +94,13 @@ def load_config() -> dict:
     test_limit = os.environ.get("TEST_LIMIT", "")
     cfg["test_limit"] = int(test_limit) if test_limit.isdigit() else None
 
+    # 并发控制
+    concurrency = os.environ.get("MAX_CONCURRENCY", "")
+    if concurrency.isdigit():
+        cfg["ai"]["concurrency"] = int(concurrency)
+    elif "concurrency" not in cfg["ai"]:
+        cfg["ai"]["concurrency"] = 5
+
     return cfg
 
 
@@ -103,6 +112,7 @@ def load_config() -> dict:
 class DataStore:
     def __init__(self, path: Path):
         self.path = path
+        self.lock = threading.Lock()
         self.data = self._load()
 
     def _load(self) -> dict:
@@ -116,19 +126,21 @@ class DataStore:
             return {"last_updated": "", "repos": {}}
 
     def save(self):
-        self.data["last_updated"] = datetime.now(timezone.utc).strftime(
-            "%Y-%m-%d %H:%M UTC"
-        )
-        with open(self.path, "w", encoding="utf-8") as f:
-            json.dump(self.data, f, ensure_ascii=False, indent=2)
+        with self.lock:
+            self.data["last_updated"] = datetime.now(timezone.utc).strftime(
+                "%Y-%m-%d %H:%M UTC"
+            )
+            with open(self.path, "w", encoding="utf-8") as f:
+                json.dump(self.data, f, ensure_ascii=False, indent=2)
 
     def update_repo(self, full_name: str, metadata: dict, summary: dict):
-        self.data["repos"][full_name] = {
-            "metadata": metadata,
-            "summary": summary,
-            "pushed_at": metadata.get("updated_at", ""),
-            "updated_at": datetime.now(timezone.utc).strftime("%Y-%m-%d"),
-        }
+        with self.lock:
+            self.data["repos"][full_name] = {
+                "metadata": metadata,
+                "summary": summary,
+                "pushed_at": metadata.get("updated_at", ""),
+                "updated_at": datetime.now(timezone.utc).strftime("%Y-%m-%d"),
+            }
 
     def get_repo(self, full_name: str) -> Optional[dict]:
         return self.data["repos"].get(full_name)
@@ -333,34 +345,50 @@ def main():
     all_repos = gh.get_starred_repos()
 
     # 2. 增量处理
-    new_count = 0
-    for i, repo in enumerate(all_repos, 1):
+    new_repos_to_process = []
+    seen_full_names = set()  # 防止 API 返回重复数据
+    test_limit = cfg.get("test_limit")
+
+    for repo in all_repos:
         full_name = repo["full_name"]
+
+        # 跳过已经在此次运行中处理过或已存在于 JSON 中的
+        if full_name in seen_full_names:
+            continue
+
         existing = store.get_repo(full_name)
-
-        # 如果已存在且 stars 差别不大（或者你想要定期更新也可以在此加入逻辑）
-        # 这里演示增量更新：如果 JSON 里没有，则处理
         if not existing:
-            # 检查测试限制
-            test_limit = cfg.get("test_limit")
-            if test_limit is not None and new_count >= test_limit:
-                log.info(f"⚠️ 已达到测试限制数量 ({test_limit})，停止处理新项目")
-                break
-
-            log.info(f"[{i}/{len(all_repos)}] 正在处理新仓库: {full_name}")
-            readme = gh.get_readme(full_name, cfg["ai"].get("max_readme_length", 4000))
-            if not readme and not repo["description"]:
-                summary = {"zh": "暂无描述。", "tags": []}
-            else:
-                summary = ai.summarize(full_name, repo["description"], readme)
-
-            store.update_repo(full_name, repo, summary)
-            new_count += 1
-            time.sleep(1)  # 频率限制
+            if test_limit is not None and len(new_repos_to_process) >= test_limit:
+                continue
+            new_repos_to_process.append(repo)
+            seen_full_names.add(full_name)
         else:
             # 更新元数据信息（Stars 数等）但保留旧摘要
             existing["metadata"] = repo
-            # 可以根据需要判断是否由于 stars 增加很多或时间太久而重新生成摘要
+            seen_full_names.add(full_name)
+
+    def process_repo(args):
+        idx, repo_data = args
+        fname = repo_data["full_name"]
+        total = len(new_repos_to_process)
+
+        log.info(f"[{idx}/{total}] 正在处理新仓库: {fname}")
+        readme_content = gh.get_readme(fname, cfg["ai"].get("max_readme_length", 4000))
+
+        if not readme_content and not repo_data["description"]:
+            summ = {"zh": "暂无描述。", "tags": []}
+        else:
+            summ = ai.summarize(fname, repo_data["description"], readme_content)
+
+        store.update_repo(fname, repo_data, summ)
+        return True
+
+    new_count = len(new_repos_to_process)
+    if new_count > 0:
+        concurrency = cfg["ai"].get("concurrency", 5)
+        log.info(f"🚀 开始并发处理 {new_count} 个新仓库 (并发数: {concurrency})")
+        with ThreadPoolExecutor(max_workers=concurrency) as executor:
+            list(executor.map(process_repo, enumerate(new_repos_to_process, 1)))
 
     if new_count > 0:
         store.save()

@@ -24,13 +24,16 @@ ai:
   model: "gpt-4o-mini"
 
   # README 截取最大长度（字符数），避免 Token 超限
-  max_readme_length: 4000
+  max_readme_length: 8000
 
   # 请求超时时间（秒）
   timeout: 60
 
   # AI 请求失败时的重试次数
   max_retries: 3
+
+  # 并发生成摘要的线程数
+  concurrency: 5
 
 # ── 输出配置 ─────────────────────────────────────────────
 output:
