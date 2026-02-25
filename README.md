@@ -102,7 +102,7 @@ vault_sync:
 
 如果你想将 `stars.md` 自动同步到 Obsidian Vault：
 
-1. 在 Vault 仓库所属账号创建一个 **Fine-grained Personal Access Token（PAT）**，赋予目标 Vault 仓库的 **Contents: Read and write** 权限
+1. 在 Vault 仓库所属账号创建一个 **[Fine-grained Personal Access Token（PAT）](https://github.com/settings/personal-access-tokens)**，赋予目标 Vault 仓库的 **Contents: Read and write** 权限
 
 2. 将 PAT 添加为本仓库的 Secret：`VAULT_PAT`
 
