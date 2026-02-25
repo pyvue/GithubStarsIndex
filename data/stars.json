@@ -1,0 +1,63 @@
+{
+  "last_updated": "2026-02-25 06:38 UTC",
+  "repos": {
+    "op7418/Document-illustrator-skill": {
+      "metadata": {
+        "full_name": "op7418/Document-illustrator-skill",
+        "name": "Document-illustrator-skill",
+        "owner": "op7418",
+        "description": "帮你从文档生成对应的多张配图，内置了歸藏精心探索的图片风格，支持 16:9 和 3:4 两种比例，方便发小红书以及推特。",
+        "stars": 251,
+        "language": "Python",
+        "url": "https://github.com/op7418/Document-illustrator-skill",
+        "homepage": "",
+        "topics": [],
+        "updated_at": "2026-01-21"
+      },
+      "summary": {
+        "zh": "基于AI的文档配图生成工具，支持多格式文档智能解析，内置渐变玻璃、票据、矢量插画三种风格，可生成16:9和3:4比例图片，适用于小红书、推特等社交媒体内容创作。",
+        "tags": [
+          "AI配图",
+          "文档可视化",
+          "社交媒体",
+          "Claude Skill",
+          "多风格生成",
+          "智能归纳",
+          "Python工具",
+          "Gemini API"
+        ]
+      },
+      "pushed_at": "2026-01-21",
+      "updated_at": "2026-02-25"
+    },
+    "HKUDS/nanobot": {
+      "metadata": {
+        "full_name": "HKUDS/nanobot",
+        "name": "nanobot",
+        "owner": "HKUDS",
+        "description": "\"🐈 nanobot: The Ultra-Lightweight OpenClaw\"",
+        "stars": 24723,
+        "language": "Python",
+        "url": "https://github.com/HKUDS/nanobot",
+        "homepage": "",
+        "topics": [],
+        "updated_at": "2026-02-25"
+      },
+      "summary": {
+        "zh": "nanobot 是一款超轻量级个人 AI 助手，仅约 4000 行代码，功能完整且高度模块化。支持多平台通信（Slack、Discord、飞书等）、MCP 协议、多模态输入与记忆系统，适用于构建高效、可扩展的智能代理应用。",
+        "tags": [
+          "AI助手",
+          "轻量级",
+          "多平台支持",
+          "MCP协议",
+          "Python",
+          "开源",
+          "智能代理",
+          "模块化设计"
+        ]
+      },
+      "pushed_at": "2026-02-25",
+      "updated_at": "2026-02-25"
+    }
+  }
+}
