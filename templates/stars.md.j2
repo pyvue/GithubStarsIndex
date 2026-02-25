@@ -1,28 +1,34 @@
-# ⭐ GitHub Stars 知识库
+# ⭐ GitHub Stars Index
 
-> 🤖 由 [GitHubStarIndex](https://github.com/iblogc/GithubStarIndex) 自动生成 · 最后更新：{{ last_updated }} · 共 **{{ repos|length }}** 个项目
+> Updated: {{ last_updated }} · Total: {{ repos|length }}
 
 ---
 
-## 📑 目录
-
+## 📑 Index
 {% for repo in repos -%}
 - [{{ repo.full_name }}](#{{ repo.full_name | lower | replace('/', '') | replace('.', '') }})
-{% endfor %}
+{%- endfor %}
 
 ---
 
 {% for repo in repos %}
 ### {{ repo.full_name }}
-⭐ **{{ "{:,}".format(repo.stars) }}** · **{{ repo.language }}** · **{{ repo.updated_at }}** | [🔗 GitHub核心]({{ repo.url }}){% if repo.homepage %} | [🌐 官网]({{ repo.homepage }}){% endif %}
-> 🤖 **AI 摘要**: {{ repo.summary.zh }}
+<a id="{{ repo.full_name | lower | replace('/', '') | replace('.', '') }}"></a>
+
+⭐ {{ "{:,}".format(repo.stars) }} · {{ repo.language or "Unknown" }} · {{ repo.updated_at }}  
+[GitHub]({{ repo.url }}){% if repo.homepage %} · [Site]({{ repo.homepage }}){% endif %}
+
+> {{ repo.summary.zh | trim }}
+
 {% set ai_tags = repo.summary.tags or [] %}
 {% set topics = repo.topics or [] %}
 {% if ai_tags or topics %}
-> 🏷️ {% for t in ai_tags %}`#{{ t }}` {% endfor %}{% for t in topics[:5] %}`#{{ t }}` {% endfor %}
+{% for t in ai_tags[:5] %}`#{{ t }}` {% endfor %}
+{% for t in topics[:5] %}`#{{ t }}` {% endfor %}
 {% endif %}
+
 {% if repo.description %}
-> *📝 {{ repo.description | trim }}*
+<sub>{{ repo.description | trim }}</sub>
 {% endif %}
 
 ---
