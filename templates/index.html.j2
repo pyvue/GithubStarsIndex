@@ -21,6 +21,8 @@
             --border: #1a1a1a;
             --transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
             --modal-overlay: rgba(0, 0, 0, 0.85);
+            --glass: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.1);
         }
 
         [data-theme='light'] {
@@ -32,6 +34,8 @@
             --surface: #ffffff;
             --border: #dddddd;
             --modal-overlay: rgba(255, 255, 255, 0.7);
+            --glass: rgba(0, 0, 0, 0.03);
+            --glass-border: rgba(0, 0, 0, 0.1);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -261,6 +265,165 @@
         
         #search-input::placeholder { color: var(--border); }
 
+        /* Control Bar (Filter & Sort) */
+        .controls-section {
+            margin-bottom: 3rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .filter-bar {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .dropdown {
+            position: relative;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.75rem;
+        }
+
+        .dropdown-trigger {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: var(--fg);
+            padding: 0.6rem 1.2rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            transition: var(--transition);
+        }
+
+        .dropdown-trigger:hover {
+            border-color: var(--fg);
+        }
+
+        .dropdown-content {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            z-index: 500;
+            min-width: 200px;
+            display: none;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .dropdown.active .dropdown-content {
+            display: block;
+        }
+
+        .dropdown-item {
+            padding: 0.8rem 1.2rem;
+            cursor: pointer;
+            transition: var(--transition);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .dropdown-item:hover {
+            background: var(--glass);
+            color: var(--accent);
+        }
+
+        .active-filters {
+            display: flex;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-chip {
+            background: var(--accent-soft);
+            color: var(--accent);
+            padding: 0.4rem 0.8rem;
+            font-size: 0.7rem;
+            font-family: 'Space Mono', monospace;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            border: 1px solid var(--accent);
+        }
+
+        .filter-chip span {
+            cursor: pointer;
+            opacity: 0.6;
+        }
+
+        .filter-chip span:hover { opacity: 1; }
+
+        .sort-pill-group {
+            display: flex;
+            gap: 0.5rem;
+            background: var(--surface);
+            padding: 0.3rem;
+            border: 1px solid var(--border);
+            align-self: flex-start;
+        }
+
+        .sort-pill {
+            padding: 0.4rem 1rem;
+            font-size: 0.7rem;
+            font-family: 'Space Mono', monospace;
+            cursor: pointer;
+            transition: var(--transition);
+            color: var(--fg-dim);
+        }
+
+        .sort-pill.active {
+            background: var(--fg);
+            color: var(--bg);
+        }
+
+        /* Stats Bar Enhancements */
+        .stats-dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 4rem;
+        }
+
+        .stat-card {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .stat-card-label {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.65rem;
+            color: var(--fg-dim);
+            text-transform: uppercase;
+        }
+
+        .stat-card-value {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 700;
+            font-size: 1.5rem;
+        }
+
+        .stat-card-value b { color: var(--accent); }
+
+        /* Skeleton Loading */
+        .skeleton {
+            background: linear-gradient(90deg, var(--surface) 25%, var(--border) 50%, var(--surface) 75%);
+            background-size: 200% 100%;
+            animation: skeleton-loading 1.5s infinite;
+        }
+
+        @keyframes skeleton-loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
         /* Grid */
         .repo-grid {
             display: grid;
@@ -288,6 +451,13 @@
         .ui-stars {
             color: var(--accent);
             font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .ui-stars svg, .ui-stars .star-icon {
+            transform: translateY(-1px);
         }
 
         .ui-tag {
@@ -628,6 +798,11 @@
         <header>
             <div class="title-area">
                 <h1>Stars<br>Archive</h1>
+                <div class="header-links" style="justify-content: flex-start; margin-top: 2rem;">
+                    <button id="lang-btn" class="lang-toggle">LANG: ZH_CN</button>
+                    <button id="theme-btn" class="theme-toggle">UI_THEME: NOIR_MODE</button>
+                    <a href="https://github.com/iblogc/GithubStarsIndex" target="_blank">[ SOURCE_CODE ]</a>
+                </div>
             </div>
             <div class="header-stats">
                 <div class="status-badge">
@@ -636,21 +811,19 @@
                     <div class="status-dot"></div>
                 </div>
 
-                <div class="top-langs">
-                    {% for lang in top_langs %}
-                    <span class="lang-tag">{{ lang.name }} ({{ lang.count }})</span>
-                    {% endfor %}
-                </div>
-
-                <div class="stats-grid">
-                    <span class="stat-item">INDEXED: <b>{{ last_updated.split(' ')[0] if last_updated else 'UNDEFINED' }}</b></span>
-                    <span class="stat-item">ENTRIES: <b>{{ repos|length }}</b></span>
-                </div>
-
-                <div class="header-links">
-                    <button id="lang-btn" class="lang-toggle">LANG: ZH_CN</button>
-                    <button id="theme-btn" class="theme-toggle">UI_THEME: NOIR_MODE</button>
-                    <a href="https://github.com/iblogc/GithubStarsIndex" target="_blank">[ SOURCE_CODE ]</a>
+                <div class="stats-dashboard" id="dashboard">
+                    <div class="stat-card">
+                        <span class="stat-card-label">TOTAL_ENTRIES</span>
+                        <div class="stat-card-value" id="s-total">--</div>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-card-label">AVG_STARS</span>
+                        <div class="stat-card-value" id="s-avg">--</div>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-card-label">TOP_STACK</span>
+                        <div class="stat-card-value" id="s-top-stack">--</div>
+                    </div>
                 </div>
             </div>
         </header>
@@ -660,6 +833,34 @@
                 <input type="text" id="search-input" placeholder="SEARCH_KEYWORD_OR_TAG...">
                 <div class="search-hint">PRESS [/] TO FOCUS</div>
             </div>
+        </section>
+
+        <section class="controls-section">
+            <div class="filter-bar">
+                <div class="dropdown" id="lang-dropdown">
+                    <div class="dropdown-trigger">
+                        <span id="l-lang-label">LANGUAGE: ALL</span>
+                        <svg width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </div>
+                    <div class="dropdown-content" id="lang-options"></div>
+                </div>
+
+                <div class="dropdown" id="tag-dropdown">
+                    <div class="dropdown-trigger">
+                        <span id="l-tag-label">TAGS: ALL</span>
+                        <svg width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </div>
+                    <div class="dropdown-content" id="tag-options"></div>
+                </div>
+
+                <div class="sort-pill-group">
+                    <div class="sort-pill active" data-sort="pushed_at">LATEST</div>
+                    <div class="sort-pill" data-sort="stars">STARS</div>
+                    <div class="sort-pill" data-sort="full_name">A-Z</div>
+                </div>
+            </div>
+            
+            <div id="active-filters" class="active-filters"></div>
         </section>
 
         <main class="repo-grid" id="main-grid"></main>
@@ -697,7 +898,7 @@
                     <div id="m-lang" class="ui-tag card-lang" style="margin-bottom: 1rem;"></div>
                     <h2 id="m-name" class="ui-title modal-title"></h2>
                     <div class="modal-meta-group ui-meta">
-                        <div id="m-stars" class="ui-stars" style="font-size: 1rem;"></div>
+                        <div id="m-stars" class="ui-stars" style="font-size: 1.1rem;"></div>
                         <div id="m-updated"></div>
                     </div>
                     <div id="m-topics" class="topic-list"></div>
@@ -705,12 +906,12 @@
             </div>
 
             <div class="modal-section">
-                <span id="l-desc" class="section-label">ORIGINAL_DESCRIPTION</span>
+                <span id="l-desc" class="section-label">DESCRIPTION</span>
                 <p id="m-desc" class="modal-desc"></p>
             </div>
 
             <div class="modal-section">
-                <span id="l-sum" class="section-label">AI_GENERATED_SUMMARY</span>
+                <span id="l-sum" class="section-label">AI_SUMMARY</span>
                 <p id="m-summary" class="modal-summary"></p>
                 <div id="m-tags" class="topic-list" style="margin-top: 1rem;"></div>
             </div>
@@ -730,12 +931,18 @@
         let currentIndex = 0;
         let currentLang = localStorage.getItem('lang') || 'zh';
         const PAGE_SIZE = 24;
+
+        // Filter State
+        let activeLanguage = null;
+        let activeTags = new Set();
+        let currentSort = 'pushed_at';
         
         const grid = document.getElementById('main-grid');
         const trigger = document.getElementById('loading-trigger');
         const searchInput = document.getElementById('search-input');
         const modal = document.getElementById('details-modal');
         const langBtn = document.getElementById('lang-btn');
+        const activeFiltersContainer = document.getElementById('active-filters');
 
         const I18N = {
             zh: {
@@ -744,11 +951,16 @@
                 loading: "系统加载中...",
                 end: "已加载全部档案",
                 no_match: "未找到匹配项",
-                orig_desc: "原生项目描述",
-                ai_sum: "AI 生成摘要",
+                orig_desc: "项目描述",
+                ai_sum: "AI 摘要",
                 no_sum: "暂无摘要可用。",
                 github_btn: "前往 GitHub",
-                home_btn: "访问项目官网"
+                home_btn: "访问项目官网",
+                lang_all: "语言: 全部",
+                tag_all: "标签: 全部",
+                latest: "最新更新",
+                stars: "Star 数量",
+                alpha: "字母顺序"
             },
             en: {
                 search: "SEARCH KEYWORDS OR TAGS...",
@@ -756,11 +968,16 @@
                 loading: "SYSTEM_LOADING...",
                 end: "END_OF_ARCHIVE",
                 no_match: "NO_MATCH_FOUND",
-                orig_desc: "ORIGINAL_DESCRIPTION",
-                ai_sum: "AI_GENERATED_SUMMARY",
+                orig_desc: "DESCRIPTION",
+                ai_sum: "AI_SUMMARY",
                 no_sum: "No summary available.",
                 github_btn: "VIEW_ON_GITHUB",
-                home_btn: "VISIT_HOMEPAGE"
+                home_btn: "VISIT_HOMEPAGE",
+                lang_all: "LANGUAGE: ALL",
+                tag_all: "TAGS: ALL",
+                latest: "LATEST",
+                stars: "STARS",
+                alpha: "A-Z"
             }
         };
 
@@ -769,19 +986,184 @@
             searchInput.placeholder = texts.search;
             langBtn.textContent = `LANG: ${currentLang === 'zh' ? 'ZH_CN' : 'EN_US'}`;
             
-            // Re-render grid to update cards
+            document.getElementById('l-lang-label').textContent = activeLanguage ? `LANG: ${activeLanguage.toUpperCase()}` : texts.lang_all;
+            document.getElementById('l-tag-label').textContent = texts.tag_all;
+
+            const sortPills = document.querySelectorAll('.sort-pill');
+            sortPills[0].textContent = texts.latest;
+            sortPills[1].textContent = texts.stars;
+            sortPills[2].textContent = texts.alpha;
+
+            applyFiltersAndSort();
+        }
+
+        // --- Data Processing & Stats ---
+        function updateDashboard() {
+            const total = RAW_DATA.length;
+            const avgStars = Math.round(RAW_DATA.reduce((acc, curr) => acc + curr.stars, 0) / total);
+            
+            const langCounts = {};
+            RAW_DATA.forEach(r => {
+                if(r.language && r.language !== 'N/A') {
+                    langCounts[r.language] = (langCounts[r.language] || 0) + 1;
+                }
+            });
+            const topLang = Object.entries(langCounts).sort((a,b) => b[1] - a[1])[0]?.[0] || 'N/A';
+
+            document.getElementById('s-total').textContent = total;
+            document.getElementById('s-avg').innerHTML = `<b>☆</b> ${avgStars}`;
+            document.getElementById('s-top-stack').textContent = topLang.toUpperCase();
+        }
+
+        function getUniqueTags() {
+            const tags = new Set();
+            RAW_DATA.forEach(item => {
+                const itemTags = currentLang === 'zh' ? 
+                    (item.summary.tags_zh || item.summary.tags || []) : 
+                    (item.summary.tags_en || item.summary.tags || []);
+                itemTags.forEach(t => tags.add(t.toLowerCase()));
+            });
+            return Array.from(tags).sort();
+        }
+
+        function getUniqueLanguages() {
+            const langs = new Set();
+            RAW_DATA.forEach(item => {
+                if(item.language && item.language !== 'N/A') langs.add(item.language);
+            });
+            return Array.from(langs).sort();
+        }
+
+        // --- UI Initialization ---
+        function initControls() {
+            updateDashboard();
+            // Language Dropdown
+            const langOptions = document.getElementById('lang-options');
+            const langs = getUniqueLanguages();
+            langOptions.innerHTML = `<div class="dropdown-item" data-value="">ALL LANGUAGES</div>`;
+            langs.forEach(l => {
+                langOptions.innerHTML += `<div class="dropdown-item" data-value="${l}">${l.toUpperCase()}</div>`;
+            });
+
+            // Tag Dropdown
+            const tagOptions = document.getElementById('tag-options');
+            const tags = getUniqueTags();
+            tagOptions.innerHTML = '';
+            tags.forEach(t => {
+                tagOptions.innerHTML += `<div class="dropdown-item" data-value="${t}">#${t.toUpperCase()}</div>`;
+            });
+
+            // Event Listeners
+            document.querySelectorAll('.dropdown-trigger').forEach(trigger => {
+                trigger.onclick = (e) => {
+                    e.stopPropagation();
+                    const current = trigger.parentElement;
+                    document.querySelectorAll('.dropdown').forEach(d => {
+                        if(d !== current) d.classList.remove('active');
+                    });
+                    current.classList.toggle('active');
+                };
+            });
+
+            document.addEventListener('click', () => {
+                document.querySelectorAll('.dropdown').forEach(d => d.classList.remove('active'));
+            });
+
+            document.getElementById('lang-options').onclick = (e) => {
+                const item = e.target.closest('.dropdown-item');
+                if(!item) return;
+                activeLanguage = item.dataset.value || null;
+                applyFiltersAndSort();
+            };
+
+            document.getElementById('tag-options').onclick = (e) => {
+                const item = e.target.closest('.dropdown-item');
+                if(!item) return;
+                activeTags.add(item.dataset.value);
+                applyFiltersAndSort();
+            };
+
+            document.querySelectorAll('.sort-pill').forEach(pill => {
+                pill.onclick = () => {
+                    document.querySelectorAll('.sort-pill').forEach(p => p.classList.remove('active'));
+                    pill.classList.add('active');
+                    currentSort = pill.dataset.sort;
+                    applyFiltersAndSort();
+                };
+            });
+        }
+
+        function renderActiveFilters() {
+            activeFiltersContainer.innerHTML = '';
+            if(activeLanguage) {
+                const chip = document.createElement('div');
+                chip.className = 'filter-chip';
+                chip.innerHTML = `LANG: ${activeLanguage.toUpperCase()} <span onclick="removeLang()">✕</span>`;
+                activeFiltersContainer.appendChild(chip);
+            }
+            activeTags.forEach(tag => {
+                const chip = document.createElement('div');
+                chip.className = 'filter-chip';
+                chip.innerHTML = `#${tag.toUpperCase()} <span onclick="removeTag('${tag}')">✕</span>`;
+                activeFiltersContainer.appendChild(chip);
+            });
+        }
+
+        function removeLang() { activeLanguage = null; applyFiltersAndSort(); }
+        function removeTag(tag) { activeTags.delete(tag); applyFiltersAndSort(); }
+
+        function applyFiltersAndSort() {
+            const query = searchInput.value.toLowerCase();
+            const texts = I18N[currentLang];
+            
+            filteredData = RAW_DATA.filter(item => {
+                const nameMatch = item.full_name.toLowerCase().includes(query);
+                const descMatch = (item.description || '').toLowerCase().includes(query);
+                const summaryMatch = (item.summary[currentLang] || '').toLowerCase().includes(query);
+                
+                const langMatch = !activeLanguage || item.language === activeLanguage;
+                
+                const itemTags = new Set(
+                    (currentLang === 'zh' ? (item.summary.tags_zh || item.summary.tags || []) : (item.summary.tags_en || item.summary.tags || []))
+                    .map(t => t.toLowerCase())
+                );
+                const tagMatch = activeTags.size === 0 || Array.from(activeTags).every(t => itemTags.has(t));
+                
+                return (nameMatch || descMatch || summaryMatch) && langMatch && tagMatch;
+            });
+
+            // Sorting
+            filteredData.sort((a, b) => {
+                if(currentSort === 'stars') return b.stars - a.stars;
+                if(currentSort === 'full_name') return a.full_name.localeCompare(b.full_name);
+                return b.updated_at.localeCompare(a.updated_at);
+            });
+
+            renderActiveFilters();
+            
             grid.innerHTML = '';
             currentIndex = 0;
             loadMore();
+            
+            trigger.textContent = filteredData.length > 0 ? texts.loading : texts.no_match;
+            
+            // Update labels
+            document.getElementById('l-lang-label').textContent = activeLanguage ? `LANG: ${activeLanguage.toUpperCase()}` : texts.lang_all;
         }
 
-        // Render functions
+        // --- Render functions ---
+        function createSkeleton() {
+            const div = document.createElement('div');
+            div.className = 'repo-card skeleton';
+            div.style.height = '300px';
+            return div;
+        }
+
         function createCard(item) {
             const card = document.createElement('article');
             card.className = 'repo-card';
             const texts = I18N[currentLang];
             
-            // Handle dual language data
             const summary = item.summary[currentLang] || item.summary.zh || texts.no_sum;
             
             card.innerHTML = `
@@ -789,7 +1171,10 @@
                 <h2 class="card-title ui-title">${item.full_name}</h2>
                 <p class="card-desc">${summary}</p>
                 <div class="card-footer ui-meta">
-                    <span class="ui-stars">☆ ${item.stars}</span>
+                    <span class="ui-stars">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                        <span>${item.stars}</span>
+                    </span>
                     <span>${texts.updated}: ${item.updated_at}</span>
                 </div>
             `;
@@ -798,36 +1183,26 @@
         }
 
         function loadMore() {
+            const texts = I18N[currentLang];
             if (currentIndex >= filteredData.length) {
-                trigger.textContent = 'END_OF_ARCHIVE';
+                trigger.textContent = texts.end;
                 return;
             }
-            
-            const nextBatch = filteredData.slice(currentIndex, currentIndex + PAGE_SIZE);
-            nextBatch.forEach(item => {
-                grid.appendChild(createCard(item));
-            });
-            currentIndex += PAGE_SIZE;
-        }
 
-        // Search logic
-        searchInput.addEventListener('input', (e) => {
-            const query = e.target.value.toLowerCase().trim();
-            const keywords = query.split(/\s+/).filter(k => k.length > 0);
-            grid.innerHTML = '';
-            currentIndex = 0;
+            const fragment = document.createDocumentFragment();
+            const end = Math.min(currentIndex + PAGE_SIZE, filteredData.length);
             
-            filteredData = RAW_DATA.filter(item => {
-                const tagsZh = (item.summary.tags_zh || item.summary.tags || []).join(' ');
-                const tagsEn = (item.summary.tags_en || []).join(' ');
-                const searchStr = `${item.full_name} ${item.description || ''} ${item.summary.zh} ${item.summary.en || ''} ${tagsZh} ${tagsEn} ${item.topics ? item.topics.join(' ') : ''}`.toLowerCase();
-                
-                return keywords.every(kw => searchStr.includes(kw));
-            });
+            for (let i = currentIndex; i < end; i++) {
+                fragment.appendChild(createCard(filteredData[i]));
+            }
             
-            loadMore();
-            trigger.textContent = filteredData.length > 0 ? 'SYSTEM_LOADING...' : 'NO_MATCH_FOUND';
-        });
+            grid.appendChild(fragment);
+            currentIndex = end;
+            
+            if (currentIndex >= filteredData.length) {
+                trigger.textContent = texts.end;
+            }
+        }
 
         // Infinite Scroll
         const observer = new IntersectionObserver((entries) => {
@@ -836,12 +1211,19 @@
 
         observer.observe(trigger);
 
-        // Modal Logic
+        searchInput.addEventListener('input', applyFiltersAndSort);
+
+        // --- Initialization ---
+        initControls();
+        updateTexts();
         function openModal(item) {
             const texts = I18N[currentLang];
             document.getElementById('m-lang').textContent = item.language || 'DATA';
             document.getElementById('m-name').textContent = item.full_name;
-            document.getElementById('m-stars').textContent = `☆ ${item.stars}`;
+            document.getElementById('m-stars').innerHTML = `
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                <span>${item.stars}</span>
+            `;
             document.getElementById('m-updated').textContent = `${texts.updated}: ${item.updated_at}`;
             document.getElementById('m-desc').textContent = item.description || (currentLang === 'zh' ? '暂无项目描述。' : 'No original description.');
             
@@ -956,8 +1338,6 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         });
 
-        // Initialize texts
-        updateTexts();
     </script>
 </body>
 </html>
